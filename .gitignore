@@ -5,3 +5,4 @@
 /.classpath
 *.class
 target/*
+.talismanrc
