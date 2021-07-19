@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: caller-service
-        image: piomin/caller-service
+        image: boriphuth/caller-service
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080

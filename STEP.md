@@ -73,7 +73,24 @@ kubectl label --context kind-c2 namespace default istio-injection=enabled
 ## Deploy application callme-service
 brew install skaffold
 
-kubectl apply -f callme-service/k8s/ --context kind-c1
+cd callme-service
+mvn clean package
+docker build -t boriphuth/callme-service:1.1.0 .
+docker push boriphuth/callme-service:1.1.0
+
+skaffold init --force
+skaffold dev --port-forward
+
+cd caller-service
+
+mvn clean package
+docker build -t boriphuth/caller-service:1.1.0 .
+docker push boriphuth/caller-service:1.1.0
+
+skaffold init --force
+skaffold dev --port-forward
+
+kubectl apply -f callme-service/k8s/deployment_v1.yaml --context kind-c1
 kubectl get pod --context kind-c1
 
 
