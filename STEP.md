@@ -9,6 +9,9 @@ kind create cluster --name c2
 kind get clusters
 kubectx | grep kind
 
+kubectl cluster-info --context kind-c1
+kubectl cluster-info --context kind-c2
+
 ## Delete Kubernetes clusters with Kind
 kind delete cluster --name c1
 kind delete cluster --name c2
@@ -17,12 +20,15 @@ kind delete cluster --name c2
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/master/manifests/namespace.yaml --context kind-c1
 kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)" --context kind-c1
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/master/manifests/metallb.yaml --context kind-c1
-docker network inspect -f '{{.IPAM.Config}}' kind
 
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/master/manifests/namespace.yaml --context kind-c2
 kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)" --context kind-c2
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/master/manifests/metallb.yaml --context kind-c2
 
+## Get docker network ip
+docker network inspect -f '{{.IPAM.Config}}' kind 
+
+## Change IP on your get from above command
 kubectl apply -f k8s/metallb-c1.yaml --context kind-c1
 kubectl apply -f k8s/metallb-c2.yaml --context kind-c2
 
@@ -103,5 +109,8 @@ siege -r 20 -c 1 http://localhost:8080/caller/service
 siege -r 20 -c 1 http://localhost:8080/callme/ping
 siege -r 20 -c 1 http://localhost:8080/callme/ping-with-random-error
 siege -r 20 -c 1 http://localhost:8080/callme/ping-with-random-delay
+
+kubectl logs pod/callme-service-v1-74466bbdc9-5r7xc --context kind-c1
+kubectl logs pod/callme-service-v2-79f7bd4649-8cwb2 --context kind-c1
 
 ```
