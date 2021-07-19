@@ -2,6 +2,8 @@
 
 <https://piotrminkowski.com/2021/07/12/multicluster-traffic-mirroring-with-istio-and-kind/>
 
+![](2021-07-19-21-05-12.png)
+
 ```shell
 ## Create Kubernetes clusters with Kind
 kind create cluster --name c1
@@ -54,6 +56,8 @@ kubectl create secret generic cacerts -n istio-system \
       --from-file=kind-c1/cert-chain.pem \
       --context kind-c2
 
+cd ../../../
+
 kubectl --context kind-c1 label namespace istio-system topology.istio.io/network=network1
 istioctl install -f k8s/istio-c1.yaml --context kind-c1
 
@@ -96,13 +100,38 @@ docker push boriphuth/caller-service:1.1.0
 skaffold init --force
 skaffold dev --port-forward
 
-kubectl apply -f callme-service/k8s/ --context kind-c1
+kubectl apply -f callme-service/k8s/deployment_v1.yaml --context kind-c1
+kubectl apply -f caller-service/k8s/deployment.yaml --context kind-c1
+kubectl apply -f callme-service/k8s/istio-rules.yaml --context kind-c1
 kubectl get pod --context kind-c1
 
 
 
-kubectl apply -f caller-service/k8s/ --context kind-c2
+kubectl apply -f callme-service/k8s/deployment_v2.yaml --context kind-c2
 kubectl get pod --context kind-c2
+
+kubectl run curl-test --image=radial/busyboxplus:curl -i --tty --rm
+[ root@curl-test:/ ]$ nslookup callme-service
+Server:    10.96.0.10
+Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+
+Name:      callme-service
+Address 1: 10.96.190.192 callme-service.default.svc.cluster.local
+
+[ root@curl-test:/ ]$ nslookup caller-service
+Server:    10.96.0.10
+Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+
+Name:      caller-service
+Address 1: 10.96.20.124 caller-service.default.svc.cluster.local
+[ root@curl-test:/ ]$ 
+
+ping callme-service
+ping caller-service
+
+curl http://callme-service:8080/callme/ping
+
+curl http://caller-service:8080/caller/ping
 
 siege -r 20 -c 1 http://localhost:8080/caller/service
 
