@@ -90,7 +90,7 @@ docker push boriphuth/caller-service:1.1.0
 skaffold init --force
 skaffold dev --port-forward
 
-kubectl apply -f callme-service/k8s/deployment_v1.yaml --context kind-c1
+kubectl apply -f callme-service/k8s/ --context kind-c1
 kubectl get pod --context kind-c1
 
 

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: caller-service
-        image: boriphuth/caller-service
+        image: boriphuth/caller-service:1.1.0
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080

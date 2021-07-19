@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: callme-service
-          image: boriphuth/callme-service
+          image: boriphuth/callme-service:1.1.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
