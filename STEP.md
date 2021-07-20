@@ -101,8 +101,10 @@ skaffold init --force
 skaffold dev --port-forward
 
 kubectl apply -f callme-service/k8s/deployment_v1.yaml --context kind-c1
+kubectl apply -f callme-service/k8s/deployment_v2.yaml --context kind-c1
 kubectl apply -f caller-service/k8s/deployment.yaml --context kind-c1
 kubectl apply -f callme-service/k8s/istio-rules.yaml --context kind-c1
+kubectl apply -f caller-service/k8s/istio-rules.yaml --context kind-c1
 kubectl get pod --context kind-c1
 
 
@@ -131,7 +133,7 @@ ping caller-service
 
 curl http://callme-service:8080/callme/ping
 
-curl http://caller-service:8080/caller/ping
+curl http://caller.example.com/caller/ping
 
 siege -r 20 -c 1 http://localhost:8080/caller/service
 

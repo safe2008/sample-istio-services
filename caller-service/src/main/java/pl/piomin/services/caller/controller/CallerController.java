@@ -26,9 +26,19 @@ public class CallerController {
 
     @GetMapping("/ping")
     public String ping() {
-        LOGGER.info("Ping: name={}, version={}", buildProperties.getName(), version);
-        String response = restTemplate.getForObject("http://callme-service:8080/callme/ping", String.class);
-        LOGGER.info("Calling: response={}", response);
+        String response ="";
+        try {
+            LOGGER.info("Ping: name={}, version={}", buildProperties.getName(), version);
+            int i = 0;  
+            while(i < 5) {                              
+                response = restTemplate.getForObject("http://callme-service:8080/callme/ping", String.class);
+                if(response != "") i=6;
+                i++;                                    
+            }           
+            LOGGER.info("Calling: response={}", response);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+        }
         return "I'm caller-service " + version + ". Calling... " + response;
     }
 
